@@ -8,4 +8,4 @@ To run locally:
 2. `npm install`
 3. `npm run build`
 
-The point your web browser at the index.html file.
+Then point your web browser to *index.html*
