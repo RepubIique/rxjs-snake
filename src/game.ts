@@ -1,15 +1,20 @@
 import {fromEvent, Observable, Subject, timer} from 'rxjs';
 import {filter, map, scan, startWith, takeUntil, takeWhile, withLatestFrom} from 'rxjs/operators';
+import { endGame, highList } from './endGame';
 
 const GAME_TICK = 100; // time in milliseconds between updates
-const CELL_SIZE = 16; // pixels
+const CELL_SIZE = 20; // pixels
+
 
 let currentGame: Game;
+
+highList();
 
 export function gameOn(svg: SVGSVGElement) {
     if (currentGame) {
         currentGame.abandon();
     } else {
+        document.getElementById("highscore").innerHTML = `High Score: ${localStorage.highscore}`
         currentGame = new Game(svg, CELL_SIZE);
     }
 
@@ -33,6 +38,7 @@ function isOpposite(heading1: Heading, heading2: Heading): boolean {
     }
 }
 
+// Where Snake is Moving towards
 class CellLocation {
     constructor(public readonly x: number,
                 public readonly y: number) {
@@ -41,6 +47,7 @@ class CellLocation {
     next(heading: Heading): CellLocation {
         switch (heading) {
             case 'N':
+                
                 return new CellLocation(this.x, this.y - 1);
             case 'E':
                 return new CellLocation(this.x + 1, this.y);
@@ -117,6 +124,23 @@ class Game {
     }
 
     gameOn() {
+        let startScore = 0
+        let highscore = Number(localStorage.getItem("highscore"))
+        let score = Number(localStorage.getItem("score"))
+        
+        function checkHs(){
+            if (highscore !== null){
+                if (score > highscore) {
+                    // localStorage.setItem("highscore", `${Number(score)}`);
+                    document.getElementById("highscore").innerHTML = `High Score: ${localStorage.highscore}`      
+                }
+               }else {
+                   localStorage.setItem('highscore',`[]` )
+               }
+        }
+
+       
+
         const keyDowns$: Observable<KeyboardEvent> = fromEvent(document, 'keydown') as Observable<KeyboardEvent>;
         const timer$ = timer(0, GAME_TICK);
 
@@ -149,15 +173,28 @@ class Game {
             .pipe(
                 withLatestFrom(heading$),
                 scan((acc: GameState, curr: [number, Heading]) => {
+                    document.getElementById("highscore").innerHTML = `High Score: ${localStorage.highscore}`
                     const newHeading = isOpposite(acc.snake.heading, curr[1]) ? acc.snake.heading : curr[1];
                     const newHead: CellLocation = acc.snake.body[acc.snake.body.length - 1].next(newHeading);
                     const didDie = !this.board.isWithinBounds(newHead) || acc.snake.body.find((x) => x.id === newHead.id) !== undefined;
                     if (didDie) {
-                        console.log('DEAD!')
+                        
+                        console.log("emdscore: " + startScore)
+                        localStorage.setItem("score", `${Number(startScore)}`)
+                        document.getElementById("score").innerHTML = `Current Score: 0`
+                        // checkHs();
+                        localStorage.setItem('mostRecentScore', `${Number(startScore)}`)
+                        startScore = 0
+                        endGame();
                         return {...acc, isAlive: false};
-                    }
+                    } 
 
                     const didEat = acc.foodLocation && acc.foodLocation.id === newHead.id;
+                    if(didEat){
+                        startScore++;
+                        document.getElementById("score").innerHTML = `Current Score: ${startScore}`
+                        
+                    }
 
                     return {
                         isAlive: true,
@@ -178,34 +215,47 @@ class Game {
             )
             .subscribe((gameState: GameState) => {
                 gameState.snakeEvolution.newHead.forEach((cellLocation) => {
+                    
                     const rect: { x: number, y: number, width: number, height: number } = this.board.getRect(cellLocation);
                     const svgRect: SVGRectElement = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
                     svgRect.setAttribute('x', rect.x.toString());
                     svgRect.setAttribute('y', rect.y.toString());
+                    svgRect.setAttribute('rx', '4');
+                    svgRect.setAttribute('ry', '4');
                     svgRect.setAttribute('width', rect.width.toString());
                     svgRect.setAttribute('height', rect.height.toString());
                     svgRect.setAttribute('id', cellLocation.id);
+                    svgRect.setAttribute('class', 'snake')
+                    
                     this.svg.appendChild(svgRect);
+                    
+                    
+                    
                 });
+                
                 gameState.snakeEvolution.oldTail.forEach((cellLocation) => {
                     this.svg.getElementById(cellLocation.id).remove();
                 });
-
+                
                 const food: SVGRectElement = this.svg.getElementById('food') as SVGRectElement;
                 if (food) {
                     if (!gameState.foodLocation || gameState.foodLocation.id !== food.getAttribute('id')) {
                         food.remove();
+                        
                     }
                 }
 
                 if (gameState.foodLocation) {
-                    const rect: { x: number, y: number, width: number, height: number } = this.board.getRect(gameState.foodLocation);
+                    const rect: { x: number, y: number, width: number, height: number, } = this.board.getRect(gameState.foodLocation);
                     const svgRect: SVGRectElement = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
                     svgRect.setAttribute('x', rect.x.toString());
                     svgRect.setAttribute('y', rect.y.toString());
+                    svgRect.setAttribute('rx', '500');
+                    svgRect.setAttribute('ry', '500');
                     svgRect.setAttribute('width', rect.width.toString());
                     svgRect.setAttribute('height', rect.height.toString());
                     svgRect.setAttribute('id', 'food');
+                     
                     this.svg.appendChild(svgRect);
                 }
             });
