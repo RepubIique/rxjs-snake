@@ -8,14 +8,11 @@ import {
   takeWhile,
   withLatestFrom,
 } from "rxjs/operators";
-import { endGame, highList } from "./endGame";
 
 var GAME_TICK = 100; // time in milliseconds between updates
 const CELL_SIZE = 20; // pixels
 
 let currentGame: Game;
-
-// highList();
 
 export function saveHighScore() {
   const username = <HTMLInputElement>document.getElementById("username");
@@ -246,7 +243,10 @@ class Game {
 
             localStorage.setItem("mostRecentScore", `${startScore}`);
             startScore = 0;
-            endGame();
+            document.getElementById("id01").style.display = "block";
+            document.getElementById(
+              "lastscore"
+            ).innerHTML = `Score: ${localStorage.getItem("mostRecentScore")}`;
             return { ...acc, isAlive: false };
           }
 
