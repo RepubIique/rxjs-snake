@@ -10,12 +10,44 @@ import {
 } from "rxjs/operators";
 import { endGame, highList } from "./endGame";
 
-const GAME_TICK = 100; // time in milliseconds between updates
+var GAME_TICK = 100; // time in milliseconds between updates
 const CELL_SIZE = 20; // pixels
 
 let currentGame: Game;
 
 highList();
+
+export function saveHighScore() {
+  const username = <HTMLInputElement>document.getElementById("username");
+  const mostRecentScore = localStorage.getItem("mostRecentScore");
+  const highscore = JSON.parse(localStorage.getItem("highscore")) || [];
+  const MAX_HIGH_SCORES = 5;
+
+  console.log("mostrecentscore:", mostRecentScore);
+  console.log("username:", username.value);
+  const score = {
+    score: mostRecentScore,
+    name: username.value,
+  };
+  highscore.push(score);
+  highscore.sort((a: any, b: any) => b.score - a.score);
+  highscore.splice(MAX_HIGH_SCORES);
+
+  localStorage.setItem("highscore", JSON.stringify(highscore));
+  (<HTMLInputElement>document.getElementById("username")).value = "";
+  document.getElementById("id01").style.display = "none";
+
+  console.log("Current score board", highscore);
+}
+
+export function changeSpeed() {
+  const speed = <HTMLInputElement>document.getElementById("gameSpeed");
+  GAME_TICK = parseInt(speed.value);
+}
+
+export function closeModal() {
+  document.getElementById("id01").style.display = "none";
+}
 
 export function gameOn(svg: SVGSVGElement) {
   if (currentGame) {
@@ -142,20 +174,6 @@ class Game {
 
   gameOn() {
     let startScore = 0;
-    let highscore = Number(localStorage.getItem("highscore"));
-    let score = Number(localStorage.getItem("score"));
-
-    // function checkHs() {
-    //   if (highscore !== null) {
-    //     if (score > highscore) {
-    //       document.getElementById(
-    //         "highscore"
-    //       ).innerHTML = `High Score: ${localStorage.highscore}`;
-    //     }
-    //   } else {
-    //     localStorage.setItem("highscore", `[]`);
-    //   }
-    // }
 
     const keyDowns$: Observable<KeyboardEvent> = fromEvent(
       document,

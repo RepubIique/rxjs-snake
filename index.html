@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Snake!</title>
+    <title>MY SNAKE</title>
     <script
       type="module"
       src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"
@@ -66,9 +66,10 @@
                     <ion-card-content>
                       <ion-item>
                         <ion-range
-                          min="1000"
-                          max="2000"
-                          step="100"
+                          id="gameSpeed"
+                          min="40"
+                          max="150"
+                          step="10"
                           snaps="true"
                           ticks="false"
                           color="secondary"
@@ -100,42 +101,30 @@
         </ion-fab>
 
         <div id="id01" class="modal">
-          <span
-            onclick="document.getElementById('id01').style.display='none'"
-            class="close"
-            title="Close Modal"
-            >×</span
-          >
           <div id="generateForm"></div>
           <form class="modal-content" action="/action_page.php">
             <div class="container">
               <h1>Game Over</h1>
               <p id="lastscore"></p>
               <p>Enter your name and save to record score</p>
-              <input
-                type="text"
-                name="username"
+              <ion-input
                 id="username"
-                placeholder="Your name"
-              />
-
+                type="string"
+                placeholder="Enter your name"
+              ></ion-input>
               <div class="clearfix">
-                <button
-                  type="submit"
-                  class="savebtn"
-                  id="saveScoreBtn"
-                  onclick="saveHighScore(event)"
-                  disabled
-                >
-                  Save
-                </button>
-                <button
-                  type="button"
-                  onclick="document.getElementById('id01').style.display='none'"
-                  class="deletebtn"
-                >
-                  Cancel
-                </button>
+                <ion-row>
+                  <ion-col>
+                    <ion-button id="saveScoreBtn" color="success">
+                      <ion-text color="light">Save</ion-text>
+                    </ion-button>
+                  </ion-col>
+                  <ion-col>
+                    <ion-button id="cancelScoreBtn" color="danger">
+                      <ion-text color="light">Cancel</ion-text>
+                    </ion-button>
+                  </ion-col>
+                </ion-row>
               </div>
             </div>
           </form>
@@ -162,32 +151,5 @@
       nomodule
       src="https://cdn.jsdelivr.net/npm/ionicons@4.7.4/dist/ionicons/ionicons.js"
     ></script>
-    <script>
-      const username = document.getElementById("username");
-      const saveScoreBtn = document.getElementById("saveScoreBtn");
-      const mostRecentScore = localStorage.getItem("mostRecentScore");
-      const highscore = JSON.parse(localStorage.getItem("highscore")) || [];
-      const MAX_HIGH_SCORES = 5;
-
-      username.addEventListener("keyup", () => {
-        saveScoreBtn.disabled = !username.value;
-      });
-      saveHighScore = (e) => {
-        console.log("mostrecentscore:" + mostRecentScore);
-        e.preventDefault();
-        const score = {
-          score: mostRecentScore,
-          name: username.value,
-        };
-        highscore.push(score);
-        highscore.sort((a, b) => b.score - a.score);
-        highscore.splice(MAX_HIGH_SCORES);
-
-        localStorage.setItem("highscore", JSON.stringify(highscore));
-        document.getElementById("id01").style.display = "none";
-
-        console.log(highscore);
-      };
-    </script>
   </body>
 </html>
