@@ -15,7 +15,7 @@ const CELL_SIZE = 20; // pixels
 
 let currentGame: Game;
 
-highList();
+// highList();
 
 export function saveHighScore() {
   const username = <HTMLInputElement>document.getElementById("username");
@@ -38,6 +38,18 @@ export function saveHighScore() {
   document.getElementById("id01").style.display = "none";
 
   console.log("Current score board", highscore);
+
+  highscore.map((score: any) => {
+    document.getElementById("scorelist").insertAdjacentHTML(
+      "afterbegin",
+      `
+          <ion-row>
+              <ion-col size="8">${score.name}</ion-col>
+              <ion-col>${score.score}</ion-col>
+          </ion-row>
+          `
+    );
+  });
 }
 
 export function changeSpeed() {
