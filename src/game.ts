@@ -19,6 +19,7 @@ export function saveHighScore() {
   const mostRecentScore = localStorage.getItem("mostRecentScore");
   const highscore = JSON.parse(localStorage.getItem("highscore")) || [];
   const MAX_HIGH_SCORES = 5;
+  const scorelist = document.getElementById("scorelist")
 
   console.log("mostrecentscore:", mostRecentScore);
   console.log("username:", username.value);
@@ -36,9 +37,8 @@ export function saveHighScore() {
 
   console.log("Current score board", highscore);
 
-  highscore.map((score: any) => {
-    document.getElementById("scorelist").insertAdjacentHTML(
-      "afterbegin",
+  scorelist.innerHTML = highscore.map((score: any) => {
+   return (
       `
           <ion-row>
               <ion-col size="8">${score.name}</ion-col>
@@ -62,9 +62,7 @@ export function gameOn(svg: SVGSVGElement) {
   if (currentGame) {
     currentGame.abandon();
   } else {
-    document.getElementById(
-      "highscore"
-    ).innerHTML = `High Score: ${localStorage.highscore}`;
+    
     currentGame = new Game(svg, CELL_SIZE);
   }
 
@@ -224,9 +222,7 @@ class Game {
       .pipe(
         withLatestFrom(heading$),
         scan((acc: GameState, curr: [number, Heading]) => {
-          document.getElementById(
-            "highscore"
-          ).innerHTML = `High Score: ${localStorage.highscore}`;
+         
           const newHeading = isOpposite(acc.snake.heading, curr[1])
             ? acc.snake.heading
             : curr[1];
