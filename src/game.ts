@@ -11,16 +11,17 @@ import {
 
 var GAME_TICK = 100; // time in milliseconds between updates
 const CELL_SIZE = 20; // pixels
-
+const highscore = JSON.parse(localStorage.getItem("highscore")) || [];
 let currentGame: Game;
+highscoreList(highscore)
+
 
 export function saveHighScore() {
   const username = <HTMLInputElement>document.getElementById("username");
   const mostRecentScore = localStorage.getItem("mostRecentScore");
-  const highscore = JSON.parse(localStorage.getItem("highscore")) || [];
+ 
   const MAX_HIGH_SCORES = 5;
-  const scorelist = document.getElementById("scorelist")
-
+  
   console.log("mostrecentscore:", mostRecentScore);
   console.log("username:", username.value);
   const score = {
@@ -36,17 +37,30 @@ export function saveHighScore() {
   document.getElementById("id01").style.display = "none";
 
   console.log("Current score board", highscore);
+  highscoreList(highscore)
+  
+}
+
+export function highscoreList(highscore:any){
+  const scorelist = document.getElementById("scorelist")
 
   scorelist.innerHTML = highscore.map((score: any) => {
-   return (
-      `
-          <ion-row>
-              <ion-col size="8">${score.name}</ion-col>
-              <ion-col>${score.score}</ion-col>
-          </ion-row>
-          `
-    );
-  });
+    return (
+       `
+           <ion-row>
+               <ion-col size="8"><ion-text>${score.name}</ion-text></ion-col>
+               <ion-col><ion-text>${score.score}</ion-text></ion-col>
+           </ion-row>
+           `
+     );
+   });
+}
+
+export function levelUp(currentScore:any){
+  if (currentScore > 1){
+    console.log("lmao it logged")
+    
+  }
 }
 
 export function changeSpeed() {
@@ -157,6 +171,7 @@ class Board {
 
 interface GameState {
   isAlive: boolean;
+  paused:boolean;
   snake: {
     body: CellLocation[];
     heading: Heading;
@@ -186,7 +201,7 @@ class Game {
       document,
       "keydown"
     ) as Observable<KeyboardEvent>;
-    const timer$ = timer(0, GAME_TICK);
+    let timer$ = timer(0, GAME_TICK);
 
     const heading$: Observable<Heading> = keyDowns$.pipe(
       filter(
@@ -212,16 +227,28 @@ class Game {
 
     const startSnake = this.board.startSnake(2, "E");
     const state0: GameState = {
+      paused:false,
       isAlive: true,
       snake: { body: startSnake, heading: "E" },
       snakeEvolution: { newHead: startSnake, oldTail: [] },
       foodLocation: undefined,
     };
 
+    //pause function
+    window.addEventListener('keydown', function(e:any){
+      var key = e.keyCode
+      if(key === 80){ // p key
+        console.log("paused")
+        timer$ = timer(0,99999)
+        timer$.subscribe()
+      }
+    })
+
     timer$
       .pipe(
         withLatestFrom(heading$),
         scan((acc: GameState, curr: [number, Heading]) => {
+
          
           const newHeading = isOpposite(acc.snake.heading, curr[1])
             ? acc.snake.heading
@@ -233,7 +260,7 @@ class Game {
             !this.board.isWithinBounds(newHead) ||
             acc.snake.body.find((x) => x.id === newHead.id) !== undefined;
           if (didDie) {
-            console.log("endscore: " + startScore);
+            
             localStorage.setItem("score", `${startScore}`);
             document.getElementById("score").innerHTML = `Current Score: 0`;
 
@@ -249,6 +276,7 @@ class Game {
           const didEat = acc.foodLocation && acc.foodLocation.id === newHead.id;
           if (didEat) {
             startScore++;
+            levelUp(startScore)
             document.getElementById(
               "score"
             ).innerHTML = `Current Score: ${startScore}`;
