@@ -21,14 +21,22 @@
       <ion-header>
         <ion-toolbar color="primary">
           <ion-row>
-            <ion-col>
+            <ion-col size="3">
               <img src="/logo.png" class="logo" />
               <ion-title>
                 <ion-text color="light"><h4>MY SNAKE</h4></ion-text>
               </ion-title>
             </ion-col>
-            <ion-col>
-              <ion-button id="start" color="warning">
+            <ion-col size="8">
+              <ion-text class="navbar" color="light">INDUSTRY</ion-text>
+              <ion-text class="navbar" color="light">WORKERS</ion-text>
+              <ion-text class="navbar" color="light">WATCH A DEMO</ion-text>
+              <ion-text class="navbar" color="light"
+                >FREE WORKER PROFILE</ion-text
+              >
+            </ion-col>
+            <ion-col size="1">
+              <ion-button id="start" class="navbar-btn" color="warning">
                 <ion-text color="light">Play</ion-text>
               </ion-button>
             </ion-col>
@@ -102,7 +110,7 @@
 
         <div id="id01" class="modal">
           <div id="generateForm"></div>
-          <form class="modal-content" action="/action_page.php">
+          <form class="modal-content">
             <div class="container">
               <h1>Game Over</h1>
               <p id="lastscore"></p>
