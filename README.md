@@ -1,4 +1,4 @@
-# rxjs-snake
+# rxjs-mysnake
 
 A basic game of snake built with typescript and rxjs.
 
@@ -8,4 +8,4 @@ To run locally:
 2. `npm install`
 3. `npm run build`
 
-Then point your web browser to *index.html*
+IMPORTANT: Use live-server extension from VScode to load in CDN elements
