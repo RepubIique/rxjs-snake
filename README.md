@@ -9,3 +9,6 @@ To run locally:
 3. `npm run build`
 
 IMPORTANT: Use live-server extension from VScode to load in CDN elements
+
+Next Update:
+Trying to get it to run on heroku server. Code can be found on the branch
