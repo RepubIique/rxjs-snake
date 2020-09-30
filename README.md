@@ -10,5 +10,4 @@ To run locally:
 
 IMPORTANT: Use live-server extension from VScode to load in CDN elements
 
-Next Update:
-Trying to get it to run on heroku server. Code can be found on the branch
+Heroku deployment can be found here -> https://rxjs-mysnake.herokuapp.com/
